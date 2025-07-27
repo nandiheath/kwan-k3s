@@ -1,44 +1,59 @@
-# Raspberry Pi Setup
+# Raspberry Pi Boot Volume Setup
 
-This script automates the initial setup of a Raspberry Pi boot volume, preparing it for cloud-init, network configuration, and hardware-specific settings.
+Automates the initial setup of a Raspberry Pi boot volume for cloud-init, networking, hardware configuration, and certificate management.
 
-## Usage
+## Quick Start
 
-Run the script with the following command:
+1. **Insert and mount your SD card at** `/Volumes/system-boot` **on macOS.**
+2. **Generate CA certificates (if needed):**
+   ```shell
+   ./scripts/generate-certs.sh
+   ```
+3. **Run the setup script:**
+   ```shell
+   ./setup-rpi-boot-volume boot-init [node_id] [username]
+   ```
+    - `node_id`: Numeric node identifier (e.g., `0`)
+    - `username`: New Raspberry Pi user (e.g., `nandi`)
 
-```shell
-./setup-rpi-boot-volume boot-init [node_id] [username]
-```
-
-- `node_id`: Numeric identifier for the node (e.g., `0`)
-- `username`: The username to create on the Raspberry Pi (e.g., `nandi`)
-
-**Example:**
-```shell
-./setup-rpi-boot-volume boot-init 0 nandi
-```
+   **Example:**
+   ```shell
+   ./setup-rpi-boot-volume boot-init 0 nandi
+   ```
 
 ## Features
 
-- **Cloud-init configuration**: Sets timezone, locale, hostname, disables password SSH, installs extra Raspberry Pi modules, and adds custom CA certificates.
-- **User setup**: Creates a user with sudo privileges and SSH key authentication.
-- **Kernel command line**: Configures boot parameters for K3s and Raspberry Pi.
-- **Network configuration**: Enables DHCP on Ethernet and disables WiFi for reliable boot networking.
-- **PoE Hat Fan Speeds**: Optionally configures fan speed overlays for Raspberry Pi PoE Hat.
+- **Cloud-init configuration:** Sets timezone, locale, hostname, disables password SSH, installs extra modules, and adds custom CA certificates.
+- **User setup:** Creates a sudo user with SSH key authentication.
+- **Kernel command line:** Configures boot parameters for K3s and Raspberry Pi.
+- **Network:** Enables Ethernet DHCP, disables WiFi for reliable boot.
+- **PoE Hat:** Optionally configures fan speed overlays.
+- **Certificate management:** `generate-certs.sh` creates intermediate and k3s CA certificates using an existing root CA.
 
 ## Requirements
 
-- macOS system
+- macOS
 - SD card mounted at `/Volumes/system-boot`
-- Custom CA certificates at `credentials/certs/intermediate/cert.pem` and `credentials/certs/root-ca/cert.pem`
+- CA certificates:
+    - `credentials/certs/intermediate/cert.pem`
+    - `credentials/certs/root-ca/cert.pem`
 - SSH public key at `~/.ssh/id_rsa.pub`
 
-## Notes
+## File Operations
 
-- Ensure the SD card is inserted and mounted at `/Volumes/system-boot` before running the script.
-- The script will overwrite `user-data`, `cmdline.txt`, and `network-config` on the boot volume.
-- Fan speed configuration is only appended if not already present in `config.txt`.
+- Overwrites: `user-data`, `cmdline.txt`, `network-config` on the boot volume.
+- Appends PoE Hat fan config to `config.txt` if not present.
+- Certificate generation: `generate-certs.sh` creates and manages CA files in `credentials/certs`.
+
+## Troubleshooting
+
+- Ensure all required files and directories exist before running.
+- Scripts exit with error messages if prerequisites are missing.
+- For custom CA generation, use `scripts/generate-certs.sh`.
 
 ## License
 
-MIT License.
+MIT License
+```
+
+This version documents the certificate generation script, clarifies usage, and improves structure for maintainability.
